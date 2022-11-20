@@ -38,13 +38,34 @@ class Menu(ui.View):
     def __init__(self):
         super().__init__()
         self.value = None
+        self.url = ""
 
-    @ui.button(label="Confirm", style=ButtonStyle.green)
-    async def menu1(self, interaction: Interaction, button: ui.Button):
-        embed = Embed(color=Color.random())
-        embed.set_author(name=f"Confirm GET request.")
-        embed.add_field(name="You are about to send a GET request.", value="Confirm it.")
-        await interaction.response.edit_message(embed=embed)
+    @ui.button(label="Send", style=ButtonStyle.green)
+    async def send_get(self, interaction: Interaction, button: ui.Button):
+        """ Once the button has been pressed, this gets executed. """
+
+        try:
+            response = requests.get(self.url)
+            response.raise_for_status()
+
+            jsonResponse = response.json()
+            paragraph = json.dumps(jsonResponse, indent=4).strip()
+
+            SPLIT_AT_LEN = 1988
+
+            formatting = [paragraph[i: i + SPLIT_AT_LEN] for i in range(0, len(paragraph), SPLIT_AT_LEN)]
+
+            for splits in formatting:
+                await asyncio.sleep(1) # Doing stuff
+                await interaction.channel.send("```json\n%s```" % splits)
+
+            await interaction.response.send_message(f'HTTP success: {response.status_code}')
+
+        except HTTPError as http_err:
+            await interaction.response.send_message(f'HTTP error occurred: {http_err}')
+
+        except Exception as err:
+            await interaction.response.send_message(f'Other error occurred: {err}')
 
 
 client = SplineBot(intents=Intents.default())
@@ -67,33 +88,15 @@ async def _hello(interaction: Interaction, text: str) -> None:
 async def _get_request(interaction: Interaction, url: str) -> None:
     """ Makes a GET request to a URL and prints the response. """
 
+    embed = Embed(color=Color.from_rgb(225, 198, 153))
+    embed.set_author(name=f"GET Request.")
+    embed.add_field(name=url, value="Do you confirm?")
+    await interaction.channel.send(embed=embed)
+
     # Prompt confirmation.
     view = Menu()
-    await interaction.channel.send(view=view)
-
-    # Send request (Still need to do interaction response.)
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-
-        jsonResponse = response.json()
-        paragraph = json.dumps(jsonResponse, indent=4).strip()
-
-        SPLIT_AT_LEN = 1988
-
-        formatting = [paragraph[i: i + SPLIT_AT_LEN] for i in range(0, len(paragraph), SPLIT_AT_LEN)]
-
-        for splits in formatting:
-            #await interaction.response.defer()
-            await asyncio.sleep(1) # Doing stuff
-            await interaction.channel.send("```json\n%s```" % splits)
-            #await interaction.followup.send("```json\n%s```" % splits)
-
-
-    except HTTPError as http_err:
-        await interaction.response.send_message(f'HTTP error occurred: {http_err}')
-    except Exception as err:
-        await interaction.response.send_message(f'Other error occurred: {err}')
+    view.url = url
+    await interaction.response.send_message(view=view)
 
 
 if __name__ == "__main__":
