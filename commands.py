@@ -1,9 +1,13 @@
+# -*- encoding: utf-8 -*-
+
 from discord.ext import commands
 from discord import app_commands, Interaction, Color, Embed
+
 from views import SimpleEmbed, SimpleButton
+from setup import logger
 
 
-class MySlashCog(commands.Cog):
+class CommandsCog(commands.Cog):
     """ A cog is a collection of commands, listeners, and optional state to help group commands together. """
     def __init__(self, bot: commands.Bot) -> None:
         """ Initialize the cog. """

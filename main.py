@@ -13,7 +13,7 @@ from discord.ext import commands
 from configparser import ConfigParser
 from requests.exceptions import HTTPError
 
-from setup import MySlashBot
+from setup import SplineBot
 
 
 if __name__ == "__main__":
@@ -27,5 +27,5 @@ if __name__ == "__main__":
     config.read('conf.ini')
 
     # Run SplineBot.
-    client = MySlashBot()
+    client = SplineBot()
     client.run(config['settings']['token'])

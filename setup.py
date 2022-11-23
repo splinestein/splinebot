@@ -1,22 +1,21 @@
+# -*- encoding: utf-8 -*-
+
 import logging as logger
 
 from discord import app_commands, Intents, Object
 from discord.ext import commands
 
-from commands import MySlashCog
-
-__version__ = "1.0.1"
+from commands import CommandsCog
+from listeners import ListenersCog
 
 logger.basicConfig(level=logger.DEBUG)
 
 
-class MySlashBot(commands.Bot):
+class SplineBot(commands.Bot):
     def __init__(self) -> None:
         super().__init__(command_prefix="/", intents=Intents.all())
-    
-    async def on_ready(self):
-        logger.info("SplineBot has loaded. Version: %s" % __version__)
 
     async def setup_hook(self) -> None:
-        await self.add_cog(MySlashCog(self))
+        await self.add_cog(ListenersCog(self))
+        await self.add_cog(CommandsCog(self))
         await self.tree.sync(guild=None)

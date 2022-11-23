@@ -1,5 +1,7 @@
-from discord import app_commands, Intents, Client, Interaction, ui, ButtonStyle, Embed, Color, Object
+# -*- encoding: utf-8 -*-
 
+from discord import app_commands, Intents, Client, Interaction, ui, ButtonStyle, Embed, Color, Object
+from requests.exceptions import HTTPError
 
 class SimpleEmbed():
     def __init__(self):
